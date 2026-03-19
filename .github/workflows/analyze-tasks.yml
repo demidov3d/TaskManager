@@ -31,14 +31,3 @@ jobs:
           name: tasks-report-${{ github.run_id }}
           path: reports/index.html
           retention-days: 30
-      
-      - name: Comment on workflow
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.actions.createWorkflowRunAttempt({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              run_id: context.runId,
-              attempt_number: 1
-            });
