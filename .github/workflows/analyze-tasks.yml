@@ -12,22 +12,33 @@ jobs:
   analyze:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.7    # ← более новая патч-версия
+      - uses: actions/checkout@v4
       
       - name: Set up Python
-        uses: actions/setup-python@v5.1.0  # ← более новая патч-версия
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
       
       - name: Create reports directory
         run: mkdir -p reports
       
-      - name: Run analysis
-        run: python scripts/analyze_tasks.py || echo "Script not found"
+      - name: Generate HTML report
+        run: python scripts/generate_report.py
       
-      - name: Upload report
-        uses: actions/upload-artifact@v4.3.6  # ← более новая патч-версия
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: tasks-report
-          path: reports/
+          name: tasks-report-${{ github.run_id }}
+          path: reports/index.html
           retention-days: 30
+      
+      - name: Comment on workflow
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.actions.createWorkflowRunAttempt({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+              attempt_number: 1
+            });
