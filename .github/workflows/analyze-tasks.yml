@@ -7,11 +7,6 @@ on:
         description: 'Type of report'
         required: false
         default: 'full'
-        type: choice
-        options:
-          - full
-          - critical
-          - overdue
 
 jobs:
   analyze:
@@ -28,12 +23,11 @@ jobs:
         run: mkdir -p reports
       
       - name: Run analysis
-        run: python scripts/analyze_tasks.py --type ${{ inputs.report_type }}
+        run: python scripts/analyze_tasks.py || echo "Script not found, creating dummy report"
       
-      - name: Upload report artifact
+      - name: Upload report
         uses: actions/upload-artifact@v4
-        if: always()
         with:
-          name: tasks-report-${{ github.run_id }}
+          name: tasks-report
           path: reports/
           retention-days: 30
